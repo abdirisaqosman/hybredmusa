@@ -1,0 +1,2 @@
+# Copy to .dev.vars for local development. Never commit .dev.vars.
+USDA_API_KEY=your-usda-fooddata-central-key

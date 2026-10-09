@@ -1,0 +1,33 @@
+{
+  "name": "@hybredmusa/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --port 8787",
+    "build": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tests/tsconfig.json",
+    "deploy": "wrangler deploy",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply hybredmusa-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply hybredmusa-db --remote",
+    "cf-typegen": "wrangler types"
+  },
+  "dependencies": {
+    "@hono/swagger-ui": "^0.5.2",
+    "@hono/zod-openapi": "^1.6.3",
+    "@hybredmusa/shared": "*",
+    "drizzle-orm": "^0.45.4",
+    "hono": "^4.13.13",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20251001.0",
+    "drizzle-kit": "^0.31.11",
+    "typescript": "^5.9.2",
+    "wrangler": "^4.149.0",
+    "vitest": "~3.2.4",
+    "@cloudflare/vitest-pool-workers": "^0.9.14"
+  }
+}
