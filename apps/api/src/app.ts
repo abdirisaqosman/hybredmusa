@@ -1,7 +1,9 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 import { ApiException, errorBody } from "./errors.js";
+import { registerAuthRoutes } from "./routes/auth.js";
 import { registerHealthRoutes } from "./routes/health.js";
+import { registerLinkRoutes } from "./routes/links.js";
 import type { AppBindings } from "./types.js";
 
 export function createApp() {
@@ -34,6 +36,20 @@ export function createApp() {
 
   const v1 = new OpenAPIHono<AppBindings>();
   registerHealthRoutes(v1);
+  registerAuthRoutes(v1);
+  registerLinkRoutes(v1);
+
+  v1.openAPIRegistry.registerComponent("securitySchemes", "bearerAuth", {
+    type: "http",
+    scheme: "bearer",
+    description: "Used by the mobile app. Send the token returned by login.",
+  });
+  v1.openAPIRegistry.registerComponent("securitySchemes", "cookieAuth", {
+    type: "apiKey",
+    in: "cookie",
+    name: "hm_session",
+    description: "Set automatically for the web app on login.",
+  });
 
   v1.doc("/openapi.json", (c) => ({
     openapi: "3.0.0",
