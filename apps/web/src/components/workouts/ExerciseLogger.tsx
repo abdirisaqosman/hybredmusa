@@ -2,11 +2,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 import type { SessionSet } from "@hybredmusa/shared";
-import { useDeleteSet, useLogSet, usePreviousPerformance } from "@/api/workouts";
+import { useDeleteSet, useExercises, useLogSet, usePreviousPerformance } from "@/api/workouts";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MuscleDiagram } from "@/components/workouts/MuscleDiagram";
+import { musclesForExercise } from "@/lib/exerciseMuscles";
 
 interface Props {
   clientId: string;
@@ -28,6 +30,13 @@ export function ExerciseLogger({
   readOnly = false,
 }: Props) {
   const previous = usePreviousPerformance(clientId, exerciseId, sessionId);
+  // The cached exercise library gives us the muscle group, which is the fallback for custom
+  // exercises that are not in the built in muscle map.
+  const library = useExercises();
+  const muscles = musclesForExercise(
+    exerciseId,
+    library.data?.items.find((item) => item.id === exerciseId)?.muscleGroup,
+  );
   const logSet = useLogSet(sessionId);
   const deleteSet = useDeleteSet(sessionId);
 
@@ -56,6 +65,11 @@ export function ExerciseLogger({
               .map((set) => `${set.reps} x ${set.weight} kg`)
               .join(", ")}
           </p>
+        )}
+        {muscles && (
+          <CardAction>
+            <MuscleDiagram muscles={muscles} exerciseName={exerciseName} height={96} />
+          </CardAction>
         )}
       </CardHeader>
       <CardContent className="space-y-3">

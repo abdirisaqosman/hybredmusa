@@ -78,6 +78,7 @@ npm run dev
 | `npm run db:migrate:remote` | Applies migrations to the production D1 |
 | `npm run deploy` | Deploys the api Worker, then the web Worker |
 | `npm run admin:promote -- <email> --local\|--remote` | Makes an existing account an admin |
+| `npm run seed:demo -- --api <url> --days 75` | Fills an environment with demo accounts and history |
 
 ## Live
 
@@ -133,6 +134,18 @@ read diaries, workouts and charts, and comment on a day or a session.
 with disable, force logout, role change and unlink, a coach overview, the error log, the audit log
 and a live status check of D1, Open Food Facts and USDA. Admins never see an individual client's
 food, workouts, bodyweight or comments, only counts and aggregates.
+
+## Demo data
+
+`npm run seed:demo` creates a coach with four clients through the public API and writes a few
+months of food, workouts, steps and bodyweight, with one client on track, one cutting, one who
+logs sporadically and one who has just signed up. Run it again whenever you want and it reuses the
+accounts it already made, filling only the days that are missing.
+
+```bash
+npm run seed:demo                                     # local, needs npm run dev
+npm run seed:demo -- --api https://your-api.workers.dev --days 90
+```
 
 ## Becoming an admin
 

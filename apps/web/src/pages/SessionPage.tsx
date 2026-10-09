@@ -3,10 +3,13 @@ import { useNavigate, useParams } from "@tanstack/react-router";
 import { toast } from "sonner";
 import type { Exercise } from "@hybredmusa/shared";
 import { useMe } from "@/api/auth";
-import { useFinishSession, useSession, useTemplates } from "@/api/workouts";
+import { useExercises, useFinishSession, useSession, useTemplates } from "@/api/workouts";
 import { ExerciseLogger } from "@/components/workouts/ExerciseLogger";
 import { ExercisePicker } from "@/components/workouts/ExercisePicker";
+import { MuscleDiagram } from "@/components/workouts/MuscleDiagram";
+import { mergeMuscleMaps, musclesForExercise } from "@/lib/exerciseMuscles";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +28,7 @@ export function SessionPage() {
   const session = useSession(sessionId);
   const finish = useFinishSession(sessionId);
   const templates = useTemplates(me.data?.user.id ?? "");
+  const library = useExercises();
 
   const [extra, setExtra] = useState<Exercise[]>([]);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -65,6 +69,16 @@ export function SessionPage() {
     return true;
   });
 
+  // Everything this session works, shaded on one body.
+  const sessionMuscles = mergeMuscleMaps(
+    exercises.map((item) =>
+      musclesForExercise(
+        item.exerciseId,
+        library.data?.items.find((entry) => entry.id === item.exerciseId)?.muscleGroup,
+      ),
+    ),
+  );
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -98,6 +112,22 @@ export function SessionPage() {
           </Dialog>
         )}
       </div>
+
+      {sessionMuscles.primary.length > 0 && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Muscles worked</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <MuscleDiagram
+              muscles={sessionMuscles}
+              exerciseName={data.templateName ?? "this workout"}
+              height={180}
+              showLegend
+            />
+          </CardContent>
+        </Card>
+      )}
 
       {exercises.length === 0 && (
         <p className="text-sm text-muted-foreground">
