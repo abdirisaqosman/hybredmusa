@@ -79,6 +79,14 @@ npm run dev
 | `npm run deploy` | Deploys the api Worker, then the web Worker |
 | `npm run admin:promote -- <email> --local\|--remote` | Makes an existing account an admin |
 
+## Live
+
+| What | URL |
+|---|---|
+| Web app | https://hybredmusa-web.nexthype.workers.dev |
+| API (what the Flutter app will call) | https://hybredmusa-api.nexthype.workers.dev/api/v1 |
+| API docs | https://hybredmusa-web.nexthype.workers.dev/api/v1/docs |
+
 ## Deploy
 
 ```bash
@@ -90,6 +98,18 @@ npm run deploy                                 # api first, then web
 ```
 
 The api Worker must exist before the web Worker is deployed, because the service binding points at it.
+The api deploy passes the short git commit as `GIT_COMMIT`, which the admin System page shows.
+
+### Automatic deploys
+
+In the Cloudflare dashboard, connect this GitHub repo twice under Workers Builds, once per Worker:
+
+| Worker | Root directory | Build command | Deploy command |
+|---|---|---|---|
+| hybredmusa-api | `apps/api` | `npm install` | `npx wrangler deploy` |
+| hybredmusa-web | `apps/web` | `npm install && npm run build` | `npx wrangler deploy` |
+
+Both deploy on push to `main`. Deploy the api first the very first time.
 
 ## API conventions
 
