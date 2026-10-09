@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useParams } from "@tanstack/react-router";
 import { useCoachClients, useDiary } from "@/api/nutrition";
+import { CommentsCard } from "@/components/CommentsCard";
+import { ProgressCharts } from "@/components/charts/ProgressCharts";
 import { DateNav, todayIso } from "@/components/DateNav";
 import { DiaryView } from "@/components/diary/DiaryView";
 import { TargetForm } from "@/components/coach/TargetForm";
@@ -25,6 +27,8 @@ export function CoachClientDetailPage() {
         <DateNav date={date} onChange={setDate} />
       </div>
 
+      <ProgressCharts clientId={clientId} />
+
       <TargetForm clientId={clientId} />
 
       <TemplatesCard clientId={clientId} />
@@ -34,6 +38,8 @@ export function CoachClientDetailPage() {
       {diary.isPending && <Skeleton className="h-64 w-full" />}
       {diary.isError && <p className="text-sm text-destructive">{diary.error.message}</p>}
       {diary.data && <DiaryView diary={diary.data} canEdit={false} />}
+
+      <CommentsCard clientId={clientId} targetType="day" targetRef={date} title="Comments on this day" />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { swaggerUI } from "@hono/swagger-ui";
 import { ApiException, errorBody } from "./errors.js";
 import { registerAuthRoutes } from "./routes/auth.js";
 import { registerHealthRoutes } from "./routes/health.js";
+import { registerCoachRoutes } from "./routes/coach.js";
 import { registerFoodRoutes } from "./routes/foods.js";
 import { registerLinkRoutes } from "./routes/links.js";
 import { registerMetricRoutes } from "./routes/metrics.js";
@@ -46,6 +47,7 @@ export function createApp() {
   registerNutritionRoutes(v1);
   registerWorkoutRoutes(v1);
   registerMetricRoutes(v1);
+  registerCoachRoutes(v1);
 
   v1.openAPIRegistry.registerComponent("securitySchemes", "bearerAuth", {
     type: "http",

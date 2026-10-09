@@ -128,3 +128,21 @@
     @apply font-sans;
     }
 }
+
+/* Chart series colors, validated for colour vision deficiency against both
+   surfaces with the data viz palette validator. Slot order is fixed. */
+:root {
+  --viz-1: #2a78d6;
+  --viz-2: #eb6834;
+  --viz-3: #1baf7a;
+  --viz-grid: #e5e5e2;
+  --viz-axis: #52514e;
+}
+
+.dark {
+  --viz-1: #3987e5;
+  --viz-2: #d95926;
+  --viz-3: #199e70;
+  --viz-grid: #2e2e2c;
+  --viz-axis: #c3c2b7;
+}

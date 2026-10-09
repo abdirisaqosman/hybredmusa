@@ -4,6 +4,7 @@ import { useDiary } from "@/api/nutrition";
 import { DateNav, todayIso } from "@/components/DateNav";
 import { DiaryView } from "@/components/diary/DiaryView";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CommentsCard } from "@/components/CommentsCard";
 
 export function DiaryPage() {
   const me = useMe();
@@ -21,6 +22,10 @@ export function DiaryPage() {
       {diary.isPending && <Skeleton className="h-64 w-full" />}
       {diary.isError && <p className="text-sm text-destructive">{diary.error.message}</p>}
       {diary.data && <DiaryView diary={diary.data} canEdit />}
+
+      {clientId && (
+        <CommentsCard clientId={clientId} targetType="day" targetRef={date} title="Coach comments" />
+      )}
     </div>
   );
 }

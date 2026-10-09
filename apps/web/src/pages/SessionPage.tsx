@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CommentsCard } from "@/components/CommentsCard";
 
 export function SessionPage() {
   const { sessionId } = useParams({ strict: false }) as { sessionId: string };
@@ -118,6 +119,8 @@ export function SessionPage() {
       ))}
 
       {data.notes && <p className="text-sm text-muted-foreground">Notes: {data.notes}</p>}
+
+      <CommentsCard clientId={data.clientId} targetType="session" targetRef={data.id} />
 
       {!readOnly && (
         <div className="flex flex-col gap-2 sm:flex-row">

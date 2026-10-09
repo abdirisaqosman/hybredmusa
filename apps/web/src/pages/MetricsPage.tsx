@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ProgressCharts } from "@/components/charts/ProgressCharts";
 import {
   Table,
   TableBody,
@@ -97,6 +98,8 @@ export function MetricsPage() {
           </form>
         </CardContent>
       </Card>
+
+      <ProgressCharts clientId={clientId} />
 
       <Card>
         <CardHeader>
