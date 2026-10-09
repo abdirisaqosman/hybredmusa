@@ -195,7 +195,7 @@ function Charts({ data }: { data: Progress }) {
             <XAxis dataKey="date" {...axis} minTickGap={24} />
             <YAxis {...axis} width={44} />
             <Tooltip {...tooltipStyle} />
-            <Bar name="Steps" dataKey="value" fill="var(--viz-1)" radius={[4, 4, 0, 0]} />
+            <Bar name="Steps" dataKey="value" fill="var(--viz-1)" radius={[4, 4, 0, 0]} maxBarSize={48} />
           </BarChart>
         </ResponsiveContainer>
       </ChartCard>

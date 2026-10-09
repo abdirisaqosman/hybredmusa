@@ -1,6 +1,8 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 import { ApiException, errorBody } from "./errors.js";
+import { recordError } from "./services/errorLog.js";
+import { registerAdminRoutes } from "./routes/admin.js";
 import { registerAuthRoutes } from "./routes/auth.js";
 import { registerHealthRoutes } from "./routes/health.js";
 import { registerCoachRoutes } from "./routes/coach.js";
@@ -30,11 +32,28 @@ export function createApp() {
   });
 
   app.onError((err, c) => {
-    if (err instanceof ApiException) {
-      return c.json(errorBody(err.code, err.message), err.status as 400);
+    const requestId = c.get("requestId") ?? crypto.randomUUID();
+    const status = err instanceof ApiException ? Number(err.status) : 500;
+    const code = err instanceof ApiException ? err.code : "INTERNAL_ERROR";
+    const message = err instanceof ApiException ? err.message : "Something went wrong";
+
+    // Only server faults are worth storing. Client mistakes are not errors.
+    if (status >= 500) {
+      console.error("unhandled error", { requestId, err });
+      c.executionCtx.waitUntil(
+        recordError(c.env, {
+          route: new URL(c.req.url).pathname,
+          method: c.req.method,
+          status,
+          errorCode: code,
+          message: err instanceof Error ? err.message : String(err),
+          userId: c.get("user")?.id ?? null,
+          requestId,
+        }),
+      );
     }
-    console.error("unhandled error", { requestId: c.get("requestId"), err });
-    return c.json(errorBody("INTERNAL_ERROR", "Something went wrong"), 500);
+
+    return c.json(errorBody(code, message), status as 500);
   });
 
   app.notFound((c) => c.json(errorBody("NOT_FOUND", "No such route"), 404));
@@ -48,6 +67,7 @@ export function createApp() {
   registerWorkoutRoutes(v1);
   registerMetricRoutes(v1);
   registerCoachRoutes(v1);
+  registerAdminRoutes(v1);
 
   v1.openAPIRegistry.registerComponent("securitySchemes", "bearerAuth", {
     type: "http",

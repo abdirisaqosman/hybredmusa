@@ -19,7 +19,8 @@
     "db:migrate:remote": "npm run db:migrate:remote -w @hybredmusa/api",
     "deploy:api": "npm run deploy -w @hybredmusa/api",
     "deploy:web": "npm run deploy -w @hybredmusa/web",
-    "deploy": "npm run deploy:api && npm run deploy:web"
+    "deploy": "npm run deploy:api && npm run deploy:web",
+    "admin:promote": "node scripts/admin-promote.mjs"
   },
   "devDependencies": {
     "npm-run-all": "^4.1.5",

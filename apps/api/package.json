@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "wrangler dev --port 8787",
     "build": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tests/tsconfig.json",
-    "deploy": "wrangler deploy",
+    "deploy": "wrangler deploy --var GIT_COMMIT:${WORKERS_CI_COMMIT_SHA:-$(git rev-parse --short HEAD 2>/dev/null || echo unknown)}",
     "test": "vitest run",
     "test:watch": "vitest",
     "db:generate": "drizzle-kit generate",

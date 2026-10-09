@@ -7,6 +7,7 @@ import { newId } from "../lib/crypto.js";
 import { authSecurity, currentUser, errorResponses, jsonBody, jsonContent } from "../lib/openapi.js";
 import { nowIso } from "../lib/time.js";
 import { requireAuth } from "../middleware/auth.js";
+import { recordError } from "../services/errorLog.js";
 import {
   barcodeOpenFoodFacts,
   rowToFood,
@@ -86,6 +87,26 @@ export function registerFoodRoutes(app: App) {
     const value = (result: PromiseSettledResult<unknown[]>) =>
       result.status === "fulfilled" ? result.value : [];
 
+    // A food source being down is worth seeing in the admin panel.
+    for (const [source, result] of [
+      ["off", off],
+      ["usda", usda],
+    ] as const) {
+      if (result.status === "rejected") {
+        c.executionCtx.waitUntil(
+          recordError(c.env, {
+            route: `/api/v1/foods/search:${source}`,
+            method: "GET",
+            status: 502,
+            errorCode: "FOOD_SOURCE_FAILED",
+            message: String(result.reason).slice(0, 300),
+            userId: currentUser(c).id,
+            requestId: c.get("requestId"),
+          }),
+        );
+      }
+    }
+
     const items = [...value(local), ...value(usda), ...value(off)].slice(0, limit * 2);
 
     return c.json(
@@ -111,7 +132,20 @@ export function registerFoodRoutes(app: App) {
       .limit(1);
     if (local[0]) return c.json(rowToFood(local[0]), 200);
 
-    const food = await barcodeOpenFoodFacts(barcode).catch(() => null);
+    const food = await barcodeOpenFoodFacts(barcode).catch((error: unknown) => {
+      c.executionCtx.waitUntil(
+        recordError(c.env, {
+          route: "/api/v1/foods/barcode:off",
+          method: "GET",
+          status: 502,
+          errorCode: "FOOD_SOURCE_FAILED",
+          message: String(error).slice(0, 300),
+          userId: currentUser(c).id,
+          requestId: c.get("requestId"),
+        }),
+      );
+      return null;
+    });
     if (!food) throw notFound("No food with that barcode", "FOOD_NOT_FOUND");
     return c.json(food, 200);
   });

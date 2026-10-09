@@ -57,6 +57,15 @@ export function AppLayout() {
                 Clients
               </Link>
             )}
+            {role === "admin" && (
+              <Link
+                to="/admin"
+                className={cn(LINK_CLASS)}
+                activeProps={{ className: "text-sm font-medium text-foreground" }}
+              >
+                Admin
+              </Link>
+            )}
           </nav>
 
           <div className="ml-auto flex items-center gap-2">

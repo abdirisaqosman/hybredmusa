@@ -18,6 +18,14 @@ import { SignupPage } from "@/pages/SignupPage";
 import { WorkoutsPage } from "@/pages/WorkoutsPage";
 import { CoachClientDetailPage } from "@/pages/coach/ClientDetailPage";
 import { CoachClientsPage } from "@/pages/coach/ClientsPage";
+import { AdminAuditPage } from "@/pages/admin/AuditPage";
+import { AdminCoachesPage } from "@/pages/admin/CoachesPage";
+import { AdminErrorsPage } from "@/pages/admin/ErrorsPage";
+import { AdminLayout } from "@/pages/admin/AdminLayout";
+import { AdminOverviewPage } from "@/pages/admin/OverviewPage";
+import { AdminSystemPage } from "@/pages/admin/SystemPage";
+import { AdminUserDetailPage } from "@/pages/admin/UserDetailPage";
+import { AdminUsersPage } from "@/pages/admin/UsersPage";
 
 export interface RouterContext {
   queryClient: QueryClient;
@@ -118,6 +126,58 @@ const coachClientDetailRoute = createRoute({
   },
 });
 
+/** The API refuses admin routes for everyone else. This only hides the pages. */
+const adminRoute = createRoute({
+  getParentRoute: () => authedRoute,
+  path: "/admin",
+  component: AdminLayout,
+  beforeLoad: ({ context: { me } }) => {
+    if (me?.user.role !== "admin") throw redirect({ to: "/" });
+  },
+});
+
+const adminOverviewRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: "/",
+  component: AdminOverviewPage,
+});
+
+const adminUsersRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: "/users",
+  component: AdminUsersPage,
+});
+
+const adminUserDetailRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: "/users/$userId",
+  component: AdminUserDetailPage,
+});
+
+const adminCoachesRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: "/coaches",
+  component: AdminCoachesPage,
+});
+
+const adminErrorsRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: "/errors",
+  component: AdminErrorsPage,
+});
+
+const adminAuditRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: "/audit",
+  component: AdminAuditPage,
+});
+
+const adminSystemRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: "/system",
+  component: AdminSystemPage,
+});
+
 const routeTree = rootRoute.addChildren([
   publicRoute.addChildren([loginRoute, signupRoute]),
   authedRoute.addChildren([
@@ -128,6 +188,15 @@ const routeTree = rootRoute.addChildren([
     metricsRoute,
     coachClientsRoute,
     coachClientDetailRoute,
+    adminRoute.addChildren([
+      adminOverviewRoute,
+      adminUsersRoute,
+      adminUserDetailRoute,
+      adminCoachesRoute,
+      adminErrorsRoute,
+      adminAuditRoute,
+      adminSystemRoute,
+    ]),
   ]),
 ]);
 

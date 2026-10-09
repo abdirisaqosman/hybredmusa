@@ -77,6 +77,7 @@ npm run dev
 | `npm run db:migrate:local` | Applies migrations to the local D1 |
 | `npm run db:migrate:remote` | Applies migrations to the production D1 |
 | `npm run deploy` | Deploys the api Worker, then the web Worker |
+| `npm run admin:promote -- <email> --local\|--remote` | Makes an existing account an admin |
 
 ## Deploy
 
@@ -99,7 +100,32 @@ The api Worker must exist before the web Worker is deployed, because the service
 - List endpoints paginate with `?cursor=` and `?limit=`.
 - Auth accepts a session cookie (web) or `Authorization: Bearer <token>` (mobile).
 
+## What is in the app
+
+**Clients** log food by searching Open Food Facts and USDA, scanning a barcode, saving a custom
+food or quick adding numbers. They log workouts from a coach's template or from scratch, see what
+they lifted for that exercise last time, and record daily steps and bodyweight.
+
+**Coaches** see each client's adherence, set macro targets, build and assign workout templates,
+read diaries, workouts and charts, and comment on a day or a session.
+
+**Admins** get `/admin`: totals and active users, signups per day, usage, a searchable user table
+with disable, force logout, role change and unlink, a coach overview, the error log, the audit log
+and a live status check of D1, Open Food Facts and USDA. Admins never see an individual client's
+food, workouts, bodyweight or comments, only counts and aggregates.
+
+## Becoming an admin
+
+Signup can only create a coach or a client. The first admin is made from the command line:
+
+```bash
+npm run admin:promote -- you@example.com --remote
+```
+
+After that, an admin can promote others from the admin panel. Nobody can demote themselves.
+
 ## Status
 
-Phase 0 (local setup) is done: monorepo, api Worker with D1 and generated OpenAPI docs, web Worker
-serving the SPA and forwarding `/api/*` over the service binding.
+Phases 0 to 6 are done: setup, auth and roles, nutrition, workouts, steps and bodyweight, the coach
+dashboard, and the admin panel. 71 api tests cover permissions, snapshots, adherence maths and
+every admin route.
