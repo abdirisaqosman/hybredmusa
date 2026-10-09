@@ -12,6 +12,7 @@ import { AuthLayout } from "@/components/AuthLayout";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { DiaryPage } from "@/pages/DiaryPage";
 import { LoginPage } from "@/pages/LoginPage";
+import { MetricsPage } from "@/pages/MetricsPage";
 import { SessionPage } from "@/pages/SessionPage";
 import { SignupPage } from "@/pages/SignupPage";
 import { WorkoutsPage } from "@/pages/WorkoutsPage";
@@ -90,6 +91,15 @@ const sessionRoute = createRoute({
   component: SessionPage,
 });
 
+const metricsRoute = createRoute({
+  getParentRoute: () => authedRoute,
+  path: "/metrics",
+  component: MetricsPage,
+  beforeLoad: ({ context: { me } }) => {
+    if (me?.user.role !== "client") throw redirect({ to: "/" });
+  },
+});
+
 const coachClientsRoute = createRoute({
   getParentRoute: () => authedRoute,
   path: "/coach/clients",
@@ -115,6 +125,7 @@ const routeTree = rootRoute.addChildren([
     diaryRoute,
     workoutsRoute,
     sessionRoute,
+    metricsRoute,
     coachClientsRoute,
     coachClientDetailRoute,
   ]),

@@ -39,6 +39,15 @@ export function AppLayout() {
                 Diary
               </Link>
             )}
+            {role === "client" && (
+              <Link
+                to="/metrics"
+                className={cn(LINK_CLASS)}
+                activeProps={{ className: "text-sm font-medium text-foreground" }}
+              >
+                Steps
+              </Link>
+            )}
             {role === "coach" && (
               <Link
                 to="/coach/clients"
