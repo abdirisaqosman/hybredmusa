@@ -280,3 +280,45 @@ describe("barcode lookup", () => {
     expect(await res.json()).toMatchObject({ error: { code: "FOOD_NOT_FOUND" } });
   });
 });
+
+describe("Open Food Facts search", () => {
+  it("looks up each hit's nutrition and skips products without calories", async () => {
+    const { clientCookie } = await coachAndClient();
+
+    fetchMock
+      .get("https://search.openfoodfacts.org")
+      .intercept({ path: (p) => p.startsWith("/search") })
+      .reply(200, { hits: [{ code: "111" }, { code: "222" }] });
+
+    fetchMock
+      .get("https://world.openfoodfacts.org")
+      .intercept({ path: (p) => p.includes("/product/111.json") })
+      .reply(200, {
+        product: {
+          code: "111",
+          product_name: "Test oat bar",
+          brands: "Testy",
+          nutriments: {
+            "energy-kcal_100g": 410,
+            proteins_100g: 9,
+            carbohydrates_100g: 60,
+            fat_100g: 14,
+          },
+        },
+      });
+
+    // No calories, so this one must not show up in the results.
+    fetchMock
+      .get("https://world.openfoodfacts.org")
+      .intercept({ path: (p) => p.includes("/product/222.json") })
+      .reply(200, { product: { code: "222", product_name: "Mystery", nutriments: {} } });
+
+    const res = await get("/foods/search?q=oat%20bar", { cookie: clientCookie });
+    const body = (await res.json()) as { items: Food[]; sources: { off: boolean } };
+
+    expect(body.sources.off).toBe(true);
+    const found = body.items.filter((item) => item.source === "off");
+    expect(found).toHaveLength(1);
+    expect(found[0]).toMatchObject({ ref: "off:111", caloriesPer100g: 410 });
+  });
+});

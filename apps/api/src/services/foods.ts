@@ -79,13 +79,26 @@ async function fetchJson<T>(url: string): Promise<T> {
   return (await res.json()) as T;
 }
 
+/**
+ * Open Food Facts search lives on search.openfoodfacts.org now. It returns
+ * matches without nutrition values, so we pull each hit's per 100 g numbers
+ * from the product API in parallel and drop anything without calories.
+ */
 export async function searchOpenFoodFacts(query: string, limit: number): Promise<Food[]> {
   const url =
-    `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}` +
-    `&search_simple=1&action=process&json=1&page_size=${limit}` +
-    `&fields=code,product_name,brands,nutriments`;
-  const data = await fetchJson<{ products?: OffProduct[] }>(url);
-  return (data.products ?? []).map(offToFood).filter((f): f is Food => f !== null);
+    `https://search.openfoodfacts.org/search?q=${encodeURIComponent(query)}` +
+    `&page_size=${Math.min(limit, 10)}&fields=code,product_name,brands`;
+  const data = await fetchJson<{ hits?: Array<{ code?: string; product_name?: string }> }>(url);
+
+  const codes = (data.hits ?? [])
+    .map((hit) => hit.code)
+    .filter((code): code is string => Boolean(code));
+
+  const products = await Promise.allSettled(codes.map((code) => barcodeOpenFoodFacts(code)));
+
+  return products
+    .map((result) => (result.status === "fulfilled" ? result.value : null))
+    .filter((food): food is Food => food !== null);
 }
 
 export async function barcodeOpenFoodFacts(barcode: string): Promise<Food | null> {

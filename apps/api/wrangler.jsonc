@@ -8,8 +8,7 @@
     {
       "binding": "DB",
       "database_name": "hybredmusa-db",
-      // Replaced with the real id from `wrangler d1 create hybredmusa-db` before deploying.
-      "database_id": "local-dev-placeholder",
+      "database_id": "7cb87200-7a59-4a45-a4bc-be2c18091746",
       "migrations_dir": "migrations"
     }
   ],
