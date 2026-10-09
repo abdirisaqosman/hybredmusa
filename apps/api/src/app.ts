@@ -6,6 +6,7 @@ import { registerHealthRoutes } from "./routes/health.js";
 import { registerFoodRoutes } from "./routes/foods.js";
 import { registerLinkRoutes } from "./routes/links.js";
 import { registerNutritionRoutes } from "./routes/nutrition.js";
+import { registerWorkoutRoutes } from "./routes/workouts.js";
 import type { AppBindings } from "./types.js";
 
 export function createApp() {
@@ -42,6 +43,7 @@ export function createApp() {
   registerLinkRoutes(v1);
   registerFoodRoutes(v1);
   registerNutritionRoutes(v1);
+  registerWorkoutRoutes(v1);
 
   v1.openAPIRegistry.registerComponent("securitySchemes", "bearerAuth", {
     type: "http",

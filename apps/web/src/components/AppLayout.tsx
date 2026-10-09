@@ -23,6 +23,15 @@ export function AppLayout() {
           <nav className="flex items-center gap-4">
             {role === "client" && (
               <Link
+                to="/workouts"
+                className={cn(LINK_CLASS)}
+                activeProps={{ className: "text-sm font-medium text-foreground" }}
+              >
+                Workouts
+              </Link>
+            )}
+            {role === "client" && (
+              <Link
                 to="/diary"
                 className={cn(LINK_CLASS)}
                 activeProps={{ className: "text-sm font-medium text-foreground" }}

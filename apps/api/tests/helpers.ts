@@ -71,3 +71,11 @@ export async function coachAndClient() {
     clientId: clientUser.user.id,
   };
 }
+
+export async function put(path: string, body: unknown, headers: HeadersInit = {}) {
+  return SELF.fetch(`${BASE}${path}`, {
+    method: "PUT",
+    headers: { "content-type": "application/json", ...headers },
+    body: JSON.stringify(body),
+  });
+}

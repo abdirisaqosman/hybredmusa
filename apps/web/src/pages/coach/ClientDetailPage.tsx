@@ -4,6 +4,8 @@ import { useCoachClients, useDiary } from "@/api/nutrition";
 import { DateNav, todayIso } from "@/components/DateNav";
 import { DiaryView } from "@/components/diary/DiaryView";
 import { TargetForm } from "@/components/coach/TargetForm";
+import { TemplatesCard } from "@/components/coach/TemplatesCard";
+import { ClientWorkouts } from "@/components/coach/ClientWorkouts";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function CoachClientDetailPage() {
@@ -24,6 +26,10 @@ export function CoachClientDetailPage() {
       </div>
 
       <TargetForm clientId={clientId} />
+
+      <TemplatesCard clientId={clientId} />
+
+      <ClientWorkouts clientId={clientId} />
 
       {diary.isPending && <Skeleton className="h-64 w-full" />}
       {diary.isError && <p className="text-sm text-destructive">{diary.error.message}</p>}

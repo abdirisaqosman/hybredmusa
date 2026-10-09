@@ -12,7 +12,9 @@ import { AuthLayout } from "@/components/AuthLayout";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { DiaryPage } from "@/pages/DiaryPage";
 import { LoginPage } from "@/pages/LoginPage";
+import { SessionPage } from "@/pages/SessionPage";
 import { SignupPage } from "@/pages/SignupPage";
+import { WorkoutsPage } from "@/pages/WorkoutsPage";
 import { CoachClientDetailPage } from "@/pages/coach/ClientDetailPage";
 import { CoachClientsPage } from "@/pages/coach/ClientsPage";
 
@@ -73,6 +75,21 @@ const diaryRoute = createRoute({
   },
 });
 
+const workoutsRoute = createRoute({
+  getParentRoute: () => authedRoute,
+  path: "/workouts",
+  component: WorkoutsPage,
+  beforeLoad: ({ context: { me } }) => {
+    if (me?.user.role !== "client") throw redirect({ to: "/" });
+  },
+});
+
+const sessionRoute = createRoute({
+  getParentRoute: () => authedRoute,
+  path: "/workouts/$sessionId",
+  component: SessionPage,
+});
+
 const coachClientsRoute = createRoute({
   getParentRoute: () => authedRoute,
   path: "/coach/clients",
@@ -96,6 +113,8 @@ const routeTree = rootRoute.addChildren([
   authedRoute.addChildren([
     dashboardRoute,
     diaryRoute,
+    workoutsRoute,
+    sessionRoute,
     coachClientsRoute,
     coachClientDetailRoute,
   ]),
