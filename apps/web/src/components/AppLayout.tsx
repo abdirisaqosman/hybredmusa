@@ -2,19 +2,45 @@ import { Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { LogOut } from "lucide-react";
 import { useLogout, useMe } from "@/api/auth";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+const LINK_CLASS = "text-sm text-muted-foreground hover:text-foreground";
 
 export function AppLayout() {
   const me = useMe();
   const logout = useLogout();
   const navigate = useNavigate();
+  const role = me.data?.user.role;
 
   return (
     <div className="min-h-dvh bg-background text-foreground">
       <header className="border-b">
-        <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4">
+        <div className="mx-auto flex h-14 max-w-5xl items-center gap-4 px-4">
           <Link to="/" className="font-semibold tracking-tight">
             Hybredmusa
           </Link>
+
+          <nav className="flex items-center gap-4">
+            {role === "client" && (
+              <Link
+                to="/diary"
+                className={cn(LINK_CLASS)}
+                activeProps={{ className: "text-sm font-medium text-foreground" }}
+              >
+                Diary
+              </Link>
+            )}
+            {role === "coach" && (
+              <Link
+                to="/coach/clients"
+                className={cn(LINK_CLASS)}
+                activeProps={{ className: "text-sm font-medium text-foreground" }}
+              >
+                Clients
+              </Link>
+            )}
+          </nav>
+
           <div className="ml-auto flex items-center gap-2">
             {me.data && (
               <span className="hidden text-sm text-muted-foreground sm:inline">

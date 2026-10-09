@@ -45,3 +45,29 @@ export async function signup(
   const res = await post("/auth/signup", body);
   return { res, body };
 }
+
+export async function del(path: string, headers: HeadersInit = {}) {
+  return SELF.fetch(`${BASE}${path}`, { method: "DELETE", headers });
+}
+
+/** A coach and a client that are actively linked, with their session cookies. */
+export async function coachAndClient() {
+  const coach = await signup({ role: "coach" });
+  const coachCookie = sessionCookie(coach.res);
+  const coachUser = (await coach.res.json()) as { user: { id: string } };
+
+  const invite = (await (
+    await post("/coach/invites", {}, { cookie: coachCookie })
+  ).json()) as { inviteCode: string };
+
+  const client = await signup({ role: "client", inviteCode: invite.inviteCode });
+  const clientCookie = sessionCookie(client.res);
+  const clientUser = (await client.res.json()) as { user: { id: string } };
+
+  return {
+    coachCookie,
+    clientCookie,
+    coachId: coachUser.user.id,
+    clientId: clientUser.user.id,
+  };
+}

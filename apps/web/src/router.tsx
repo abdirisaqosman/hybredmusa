@@ -10,8 +10,11 @@ import { ensureMe } from "@/api/auth";
 import { AppLayout } from "@/components/AppLayout";
 import { AuthLayout } from "@/components/AuthLayout";
 import { DashboardPage } from "@/pages/DashboardPage";
+import { DiaryPage } from "@/pages/DiaryPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { SignupPage } from "@/pages/SignupPage";
+import { CoachClientDetailPage } from "@/pages/coach/ClientDetailPage";
+import { CoachClientsPage } from "@/pages/coach/ClientsPage";
 
 export interface RouterContext {
   queryClient: QueryClient;
@@ -50,9 +53,7 @@ const authedRoute = createRoute({
   component: AppLayout,
   beforeLoad: async ({ context, location }) => {
     const me = await ensureMe(context.queryClient);
-    if (!me) {
-      throw redirect({ to: "/login", search: { redirect: location.href } });
-    }
+    if (!me) throw redirect({ to: "/login", search: { redirect: location.href } });
     return { me };
   },
 });
@@ -63,9 +64,41 @@ const dashboardRoute = createRoute({
   component: DashboardPage,
 });
 
+const diaryRoute = createRoute({
+  getParentRoute: () => authedRoute,
+  path: "/diary",
+  component: DiaryPage,
+  beforeLoad: ({ context: { me } }) => {
+    if (me?.user.role !== "client") throw redirect({ to: "/" });
+  },
+});
+
+const coachClientsRoute = createRoute({
+  getParentRoute: () => authedRoute,
+  path: "/coach/clients",
+  component: CoachClientsPage,
+  beforeLoad: ({ context: { me } }) => {
+    if (me?.user.role !== "coach") throw redirect({ to: "/" });
+  },
+});
+
+const coachClientDetailRoute = createRoute({
+  getParentRoute: () => authedRoute,
+  path: "/coach/clients/$clientId",
+  component: CoachClientDetailPage,
+  beforeLoad: ({ context: { me } }) => {
+    if (me?.user.role !== "coach") throw redirect({ to: "/" });
+  },
+});
+
 const routeTree = rootRoute.addChildren([
   publicRoute.addChildren([loginRoute, signupRoute]),
-  authedRoute.addChildren([dashboardRoute]),
+  authedRoute.addChildren([
+    dashboardRoute,
+    diaryRoute,
+    coachClientsRoute,
+    coachClientDetailRoute,
+  ]),
 ]);
 
 export function buildRouter(queryClient: QueryClient) {

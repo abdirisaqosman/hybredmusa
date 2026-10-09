@@ -3,7 +3,9 @@ import { swaggerUI } from "@hono/swagger-ui";
 import { ApiException, errorBody } from "./errors.js";
 import { registerAuthRoutes } from "./routes/auth.js";
 import { registerHealthRoutes } from "./routes/health.js";
+import { registerFoodRoutes } from "./routes/foods.js";
 import { registerLinkRoutes } from "./routes/links.js";
+import { registerNutritionRoutes } from "./routes/nutrition.js";
 import type { AppBindings } from "./types.js";
 
 export function createApp() {
@@ -38,6 +40,8 @@ export function createApp() {
   registerHealthRoutes(v1);
   registerAuthRoutes(v1);
   registerLinkRoutes(v1);
+  registerFoodRoutes(v1);
+  registerNutritionRoutes(v1);
 
   v1.openAPIRegistry.registerComponent("securitySchemes", "bearerAuth", {
     type: "http",

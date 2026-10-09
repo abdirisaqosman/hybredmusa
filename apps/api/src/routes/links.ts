@@ -42,6 +42,20 @@ const listInvites = createRoute({
   },
 });
 
+const listClients = createRoute({
+  method: "get",
+  path: "/coach/clients",
+  tags: ["links"],
+  summary: "The active clients of this coach",
+  security: authSecurity,
+  middleware: coachGuards,
+  responses: {
+    200: jsonContent(z.object({ items: z.array(publicUserSchema) }), "Clients"),
+    401: errorResponses[401],
+    403: errorResponses[403],
+  },
+});
+
 const linkToCoach = createRoute({
   method: "post",
   path: "/client/link",
@@ -118,6 +132,22 @@ export function registerLinkRoutes(app: App) {
       },
       200,
     );
+  });
+
+  app.openapi(listClients, async (c) => {
+    const coach = currentUser(c);
+    const rows = await db(c.env)
+      .select({ client: schema.users })
+      .from(schema.coachClients)
+      .innerJoin(schema.users, eq(schema.users.id, schema.coachClients.clientId))
+      .where(
+        and(
+          eq(schema.coachClients.coachId, coach.id),
+          eq(schema.coachClients.status, "active"),
+        ),
+      );
+
+    return c.json({ items: rows.map((row) => toPublicUser(row.client)) }, 200);
   });
 
   app.openapi(linkToCoach, async (c) => {
